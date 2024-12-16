@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import rendergroundAPI from "@/lib/apiInstance";
 
 export const useCanvas = () => {
   const [canvasId, setCanvasId] = useState(null);
@@ -12,19 +13,14 @@ export const useCanvas = () => {
     try {
       console.log("Initializing canvas...");
       setIsLoading(true);
-      const response = await fetch("http://localhost:6969/canvas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: `canvas-${Date.now()}`,
-          width: 800,
-          height: 600,
-          backgroundColor: "white",
-        }),
+      const response = await rendergroundAPI.post("/canvas", {
+        id: `canvas-${Date.now()}`,
+        width: 800,
+        height: 600,
+        backgroundColor: "white",
       });
 
-      if (!response.ok) throw new Error("Failed to initialize canvas");
-      const data = await response.json();
+      const data = response.data;
       console.log("Canvas initialized:", data);
       setCanvasId(data.id);
     } catch (err) {
@@ -40,16 +36,9 @@ export const useCanvas = () => {
 
     try {
       console.log("Adding shape:", shape);
-      const response = await fetch(
-        `http://localhost:6969/canvas/${canvasId}/elements`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(shape),
-        }
-      );
+      await rendergroundAPI.post(`/canvas/${canvasId}/elements`, shape);
 
-      if (!response.ok) throw new Error("Failed to add shape");
+      // If we reach here, the request was successful
       setPreviewKey((prev) => prev + 1);
       return true;
     } catch (err) {

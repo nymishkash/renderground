@@ -1,6 +1,7 @@
 "use client";
 
 import { Download } from "lucide-react";
+import rendergroundAPI from "@/lib/apiInstance";
 
 export default function ExportTools({ canvasId, isLoading }) {
   const handleExport = async () => {
@@ -8,7 +9,7 @@ export default function ExportTools({ canvasId, isLoading }) {
 
     try {
       const response = await fetch(
-        `http://localhost:6969/canvas/${canvasId}/export`,
+        `${rendergroundAPI.defaults.baseURL}/canvas/${canvasId}/export`,
         {
           method: "GET",
         }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Square, Circle, Type, Minus, Palette } from "lucide-react";
+import rendergroundAPI from "@/lib/apiInstance";
 
 export default function CanvasBuilder() {
   const [selectedTool, setSelectedTool] = useState(null);
@@ -34,24 +35,18 @@ export default function CanvasBuilder() {
   const initializeCanvas = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("http://localhost:6969/canvas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: `canvas-${Date.now()}`,
-          width: 800,
-          height: 600,
-          backgroundColor: "white",
-          metadata: {
-            createdBy: "CanvasBuilder",
-            version: "1.0",
-          },
-        }),
+      const response = await rendergroundAPI.post("/canvas", {
+        id: `canvas-${Date.now()}`,
+        width: 800,
+        height: 600,
+        backgroundColor: "white",
+        metadata: {
+          createdBy: "CanvasBuilder",
+          version: "1.0",
+        },
       });
 
-      if (!response.ok) throw new Error("Failed to initialize canvas");
-      const data = await response.json();
-      setCanvasId(data.id);
+      setCanvasId(response.data.id);
     } catch (err) {
       setError("Failed to initialize canvas. Please try refreshing the page.");
     } finally {
@@ -134,16 +129,10 @@ export default function CanvasBuilder() {
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:6969/canvas/${canvasId}/elements`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(shape),
-        }
+      const response = await rendergroundAPI.post(
+        `/canvas/${canvasId}/elements`,
+        shape
       );
-
-      if (!response.ok) throw new Error("Failed to add shape");
 
       // Force preview refresh after adding shape
       setPreviewKey((prev) => prev + 1);
@@ -253,7 +242,7 @@ export default function CanvasBuilder() {
               <button
                 onClick={() =>
                   window.open(
-                    `http://localhost:6969/canvas/${canvasId}/export/html`,
+                    `${rendergroundAPI.defaults.baseURL}/canvas/${canvasId}/export/html`,
                     "_blank"
                   )
                 }
@@ -265,7 +254,7 @@ export default function CanvasBuilder() {
               <button
                 onClick={() =>
                   window.open(
-                    `http://localhost:6969/canvas/${canvasId}/export/svg`,
+                    `${rendergroundAPI.defaults.baseURL}/canvas/${canvasId}/export/svg`,
                     "_blank"
                   )
                 }
@@ -295,7 +284,7 @@ export default function CanvasBuilder() {
               {canvasId && !isLoading && (
                 <img
                   key={previewKey} // Add key to force refresh
-                  src={`http://localhost:6969/canvas/${canvasId}/preview`}
+                  src={`${rendergroundAPI.defaults.baseURL}/canvas/${canvasId}/preview`}
                   alt="canvas"
                   className="w-full h-full"
                 />

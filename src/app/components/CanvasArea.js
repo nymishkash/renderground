@@ -1,5 +1,6 @@
 "use client";
 
+import rendergroundAPI from "@/lib/apiInstance";
 import { useState, useEffect } from "react";
 
 export default function CanvasArea({
@@ -23,7 +24,9 @@ export default function CanvasArea({
     newImage.onload = () => {
       setCurrentImage(newImage.src);
     };
-    newImage.src = `http://localhost:6969/canvas/${canvasId}/preview?v=${Date.now()}`;
+    newImage.src = `${
+      rendergroundAPI.defaults.baseURL
+    }/canvas/${canvasId}/preview?v=${Date.now()}`;
   }, [canvasId, previewKey]);
 
   const handleMouseDown = (e) => {
