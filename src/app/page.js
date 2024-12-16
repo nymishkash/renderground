@@ -1,101 +1,155 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useCanvas } from "./hooks/useCanvas";
+import { useShapes } from "./hooks/useShapes";
+import DrawingTools from "./components/DrawingTools";
+import ColorPicker from "./components/ColorPicker";
+import StrokeControls from "./components/StrokeControls";
+import ExportTools from "./components/ExportTools";
+import CanvasArea from "./components/CanvasArea";
+
+export default function Page() {
+  const { canvasId, error, isLoading, addShape, exportCanvas, previewKey } =
+    useCanvas();
+
+  const shapeControls = useShapes();
+
+  const handleCanvasClick = (e) => {
+    const rect = e.target.getBoundingClientRect();
+    const shape = shapeControls.createShape(e, rect);
+    if (shape) {
+      addShape(shape);
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="h-screen bg-gray-50 flex">
+      {/* Left Panel - Controls */}
+      <div className="w-[320px] bg-white border-r border-gray-200 h-full overflow-y-auto flex flex-col">
+        {error && (
+          <div className="p-3 m-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
+          </div>
+        )}
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        {/* Tools Section - Now with more prominence */}
+        <div className="p-4 border-b border-gray-200">
+          <DrawingTools
+            selectedTool={shapeControls.selectedTool}
+            setSelectedTool={shapeControls.setSelectedTool}
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+        <div className="flex-1 p-4 space-y-4">
+          {/* Color Section */}
+          <div className="bg-gray-50 rounded-lg p-3">
+            <h2 className="text-sm font-medium text-gray-900 mb-3">Color</h2>
+            <ColorPicker
+              currentColor={shapeControls.currentColor}
+              setCurrentColor={shapeControls.setCurrentColor}
+            />
+          </div>
+
+          {/* Style Section */}
+          <div className="bg-gray-50 rounded-lg p-3">
+            <h2 className="text-sm font-medium text-gray-900 mb-3">Style</h2>
+            <StrokeControls
+              isOutlined={shapeControls.isOutlined}
+              setIsOutlined={shapeControls.setIsOutlined}
+              strokeWidth={shapeControls.strokeWidth}
+              setStrokeWidth={shapeControls.setStrokeWidth}
+            />
+          </div>
+
+          {/* Size Controls */}
+          {shapeControls.selectedTool !== "text" && (
+            <div className="bg-gray-50 rounded-lg p-3">
+              <h2 className="text-sm font-medium text-gray-900 mb-3">Size</h2>
+              <div className="flex gap-2">
+                {shapeControls.selectedTool === "circle" ? (
+                  <div className="flex items-center gap-2 w-full">
+                    <span className="text-sm text-gray-600">Diameter:</span>
+                    <input
+                      type="number"
+                      value={shapeControls.customWidth}
+                      onChange={(e) =>
+                        shapeControls.setCustomWidth(parseInt(e.target.value))
+                      }
+                      className="flex-1 px-2 py-1.5 border rounded bg-white"
+                      min="1"
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2 flex-1">
+                      <span className="text-sm text-gray-600">W:</span>
+                      <input
+                        type="number"
+                        value={shapeControls.customWidth}
+                        onChange={(e) =>
+                          shapeControls.setCustomWidth(parseInt(e.target.value))
+                        }
+                        className="w-full px-2 py-1.5 border rounded bg-white"
+                        min="1"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2 flex-1">
+                      <span className="text-sm text-gray-600">H:</span>
+                      <input
+                        type="number"
+                        value={shapeControls.customHeight}
+                        onChange={(e) =>
+                          shapeControls.setCustomHeight(
+                            parseInt(e.target.value)
+                          )
+                        }
+                        className="w-full px-2 py-1.5 border rounded bg-white"
+                        min="1"
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Grid Controls */}
+          <div className="bg-gray-50 rounded-lg p-3">
+            <h2 className="text-sm font-medium text-gray-900 mb-3">Grid</h2>
+            <button
+              onClick={() => shapeControls.setShowGrid(!shapeControls.showGrid)}
+              className={`w-full py-1.5 px-3 rounded text-sm transition-colors ${
+                shapeControls.showGrid
+                  ? "bg-blue-500 text-white"
+                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              {shapeControls.showGrid ? "Hide Grid" : "Show Grid"}
+            </button>
+          </div>
+        </div>
+
+        {/* Export Section - Fixed at bottom */}
+        <div className="p-4 border-t border-gray-200 bg-white">
+          <ExportTools
+            canvasId={canvasId}
+            isLoading={isLoading}
+            exportCanvas={exportCanvas}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        </div>
+      </div>
+
+      {/* Right Panel - Canvas */}
+      <div className="flex-1 p-6 bg-gray-100 flex items-center justify-center">
+        <CanvasArea
+          canvasId={canvasId}
+          isLoading={isLoading}
+          onClick={handleCanvasClick}
+          showGrid={shapeControls.showGrid}
+          gridSize={shapeControls.gridSize}
+          previewKey={previewKey}
+        />
+      </div>
     </div>
   );
 }
