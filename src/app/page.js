@@ -14,9 +14,58 @@ export default function Page() {
 
   const shapeControls = useShapes();
 
-  const handleCanvasClick = (e) => {
-    const rect = e.target.getBoundingClientRect();
-    const shape = shapeControls.createShape(e, rect);
+  const handleShapeCreate = ({ x, y, width, height, text }) => {
+    let shape;
+
+    switch (shapeControls.selectedTool) {
+      case "circle":
+        shape = {
+          type: "circle",
+          properties: {
+            centerX: x,
+            centerY: y,
+            radius: width / 2,
+            fillColor: shapeControls.currentColor,
+            strokeColor: shapeControls.isOutlined ? "#000000" : "transparent",
+            strokeWidth: shapeControls.isOutlined ? shapeControls.strokeWidth : 0,
+            opacity: shapeControls.opacity / 100,
+          },
+        };
+        break;
+
+      case "text":
+        // Keep coordinates exactly as received from the click
+        shape = {
+          type: "text",
+          properties: {
+            text,
+            x,  // Use exact click coordinates
+            y,
+            font: "20px Arial",
+            textColor: shapeControls.currentColor,
+            align: "left",  // Always left align
+            baseline: "middle",
+            maxWidth: 800  // Add reasonable max width
+          },
+        };
+        break;
+
+      default: // rectangle
+        shape = {
+          type: "rectangle",
+          properties: {
+            x,
+            y,
+            width,
+            height,
+            color: shapeControls.currentColor,
+            strokeColor: shapeControls.isOutlined ? "#000000" : "transparent",
+            strokeWidth: shapeControls.isOutlined ? shapeControls.strokeWidth : 0,
+            opacity: shapeControls.opacity / 100,
+          },
+        };
+    }
+
     if (shape) {
       addShape(shape);
     }
@@ -32,7 +81,6 @@ export default function Page() {
           </div>
         )}
 
-        {/* Tools Section - Now with more prominence */}
         <div className="p-4 border-b border-gray-200">
           <DrawingTools
             selectedTool={shapeControls.selectedTool}
@@ -41,7 +89,6 @@ export default function Page() {
         </div>
 
         <div className="flex-1 p-4 space-y-4">
-          {/* Color Section */}
           <div className="bg-gray-50 rounded-lg p-3">
             <h2 className="text-sm font-medium text-gray-900 mb-3">Color</h2>
             <ColorPicker
@@ -50,7 +97,6 @@ export default function Page() {
             />
           </div>
 
-          {/* Style Section */}
           <div className="bg-gray-50 rounded-lg p-3">
             <h2 className="text-sm font-medium text-gray-900 mb-3">Style</h2>
             <StrokeControls
@@ -99,9 +145,7 @@ export default function Page() {
                         type="number"
                         value={shapeControls.customHeight}
                         onChange={(e) =>
-                          shapeControls.setCustomHeight(
-                            parseInt(e.target.value)
-                          )
+                          shapeControls.setCustomHeight(parseInt(e.target.value))
                         }
                         className="w-full px-2 py-1.5 border rounded bg-white"
                         min="1"
@@ -113,7 +157,6 @@ export default function Page() {
             </div>
           )}
 
-          {/* Grid Controls */}
           <div className="bg-gray-50 rounded-lg p-3">
             <h2 className="text-sm font-medium text-gray-900 mb-3">Grid</h2>
             <button
@@ -129,7 +172,6 @@ export default function Page() {
           </div>
         </div>
 
-        {/* Export Section - Fixed at bottom */}
         <div className="p-4 border-t border-gray-200 bg-white">
           <ExportTools
             canvasId={canvasId}
@@ -144,10 +186,11 @@ export default function Page() {
         <CanvasArea
           canvasId={canvasId}
           isLoading={isLoading}
-          onClick={handleCanvasClick}
           showGrid={shapeControls.showGrid}
           gridSize={shapeControls.gridSize}
           previewKey={previewKey}
+          onShapeCreate={handleShapeCreate}
+          selectedTool={shapeControls.selectedTool}
         />
       </div>
     </div>
