@@ -17,7 +17,6 @@ Renderground is a powerful and user-friendly canvas drawing application built wi
 - **Shape Creation**: Draw circles, rectangles, and add text to the canvas.
 - **Customizable Tools**: Select different drawing tools and customize their properties.
 - **Grid Support**: Toggle grid visibility and snap shapes to the grid for precise placement.
-- **Responsive Design**: Works seamlessly on various screen sizes.
 - **Loading State**: Displays a loading animation while the canvas is being initialized.
 
 ## Technologies Used
@@ -33,12 +32,12 @@ To get started with the project, follow these steps:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/nymishkash/renderground.git
+   git clone https://github.com/nymishkash/renderground-frontend.git
    ```
 
 2. Navigate to the project directory:
    ```bash
-   cd renderground
+   cd renderground-frontend
    ```
 
 3. Install the dependencies:
@@ -107,10 +106,5 @@ Contributions are welcome! If you have suggestions for improvements or new featu
    ```
 5. Open a pull request.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
-
-Feel free to reach out if you have any questions or need further assistance!
