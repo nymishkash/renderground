@@ -1,6 +1,6 @@
-# Canvas Drawing Application
+# Renderground
 
-A powerful and user-friendly canvas drawing application built with React. This application allows users to create various shapes, add text, and customize their drawings with different tools and styles.
+Renderground is a powerful and user-friendly canvas drawing application built with React. This application allows users to create various shapes, add text, and customize their drawings with different tools and styles.
 
 ## Table of Contents
 
@@ -33,12 +33,12 @@ To get started with the project, follow these steps:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/canvas-drawing-app.git
+   git clone https://github.com/nymishkash/renderground.git
    ```
 
 2. Navigate to the project directory:
    ```bash
-   cd canvas-drawing-app
+   cd renderground
    ```
 
 3. Install the dependencies:
