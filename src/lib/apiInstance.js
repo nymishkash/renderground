@@ -1,4 +1,3 @@
-// src/lib/api/rendergroundAPI.ts
 import axios from "axios";
 
 const rendergroundAPI = axios.create({
